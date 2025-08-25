@@ -16,7 +16,9 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const response = await adminAPI.getUsers();
-      setUsers(response.data.results || []);
+      // Handle both array response and response with results property
+      const userData = Array.isArray(response.data) ? response.data : (response.data.results || []);      
+      setUsers(userData);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users');
@@ -28,12 +30,22 @@ const UserManagement = () => {
   const handleStatusChange = async (userId, newStatus) => {
     try {
       setStatusUpdating(userId);
-      await adminAPI.updateUserStatus(userId, newStatus);
+      // Find the user to get their username
+      const user = users.find(u => u.id === userId);
+      if (!user) {
+        toast.error('User not found');
+        return;
+      }
+      
+      await adminAPI.updateUserStatus(user.username, newStatus);
       
       // Update local state
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, status: newStatus } : user
-      ));
+      setUsers(users.map(u => {
+        if (u.id === userId) {
+          return { ...u, status: newStatus };
+        }
+        return u;
+      }));
       
       toast.success(`User status updated to ${newStatus}`);
     } catch (error) {
@@ -82,18 +94,27 @@ const UserManagement = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
+          <p className="text-gray-500 mt-1">Manage system users and their access</p>
+        </div>
         <div className="flex space-x-4">
-          <Link to="/admin" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">
+          <Link to="/admin" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
             Back to Dashboard
           </Link>
-          <Link to="/admin/users/create" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+          <Link to="/admin/users/create" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
             Add New User
           </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -108,7 +129,7 @@ const UserManagement = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {users.length > 0 ? (
                 users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{user.username}</div>
                     </td>
@@ -123,14 +144,11 @@ const UserManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-3">
-                        <Link to={`/admin/users/${user.id}`} className="text-indigo-600 hover:text-indigo-900">
-                          View
-                        </Link>
                         <div className="relative inline-block text-left">
                           <div>
                             <button
                               type="button"
-                              className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+                              className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500 transition-colors"
                               id={`status-menu-button-${user.id}`}
                               aria-expanded="true"
                               aria-haspopup="true"
@@ -159,7 +177,7 @@ const UserManagement = () => {
                           >
                             <div className="py-1" role="none">
                               <button
-                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                 role="menuitem"
                                 tabIndex="-1"
                                 onClick={() => {
@@ -171,7 +189,7 @@ const UserManagement = () => {
                                 Activate
                               </button>
                               <button
-                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                 role="menuitem"
                                 tabIndex="-1"
                                 onClick={() => {
@@ -183,7 +201,7 @@ const UserManagement = () => {
                                 Freeze
                               </button>
                               <button
-                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                className="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                 role="menuitem"
                                 tabIndex="-1"
                                 onClick={() => {

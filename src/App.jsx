@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Navigation from '@/components/Navigation';
+import Layout from '@/components/Layout';
 
 // Pages
 import Login from '@/pages/Login';
@@ -15,6 +15,7 @@ import UserDetail from '@/pages/admin/UserDetail';
 import CreateUser from '@/pages/admin/CreateUser';
 import PaperAssignment from '@/pages/admin/PaperAssignment';
 import PaperReview from '@/pages/admin/PaperReview';
+import DeadlineManagement from '@/pages/admin/DeadlineManagement';
 
 // User Pages
 import UserDashboard from '@/pages/user/Dashboard';
@@ -27,8 +28,8 @@ function App() {
     <Router>
       <AuthProvider>
         <Toaster position="top-right" />
-        <Navigation />
-        <Routes>
+        <Layout>
+          <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -64,6 +65,11 @@ function App() {
               <PaperReview />
             </ProtectedRoute>
           } />
+          <Route path="/admin/papers/:paperId/deadline" element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <DeadlineManagement />
+            </ProtectedRoute>
+          } />
           
           {/* Protected user routes */}
           <Route path="/dashboard" element={
@@ -93,6 +99,7 @@ function App() {
           {/* Catch all route - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </Layout>
       </AuthProvider>
     </Router>
   );

@@ -37,10 +37,15 @@ const Register = () => {
     try {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...userData } = formData;
-      await register(userData);
+      // Ensure role is included in the request
+      await register({
+        ...userData,
+        role: userData.role || 'RESEARCHER' // Make sure role is explicitly included
+      });
       navigate('/login');
     } catch (error) {
-      toast.error('Registration failed. Please try again.');
+      console.error('Registration error details:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

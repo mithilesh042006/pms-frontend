@@ -76,7 +76,7 @@ const PaperReview = () => {
     
     try {
       setSubmitting(true);
-      await adminAPI.reviewPaper(paperId, {
+      await adminAPI.reviewPaperwork(paperId, {
         decision,
         feedback,
         version_id: selectedVersion?.id
@@ -149,6 +149,9 @@ const PaperReview = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Paper Review</h1>
         <div className="flex space-x-4">
+          <Link to={`/admin/papers/${paperId}/deadline`} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md">
+            Update Deadline
+          </Link>
           <Link to="/admin/papers" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">
             Back to Papers
           </Link>
@@ -163,6 +166,10 @@ const PaperReview = () => {
               <div>
                 <dt className="text-sm font-medium text-gray-500">Title</dt>
                 <dd className="mt-1 text-sm text-gray-900">{paper.title}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Deadline</dt>
+                <dd className="mt-1 text-sm text-gray-900">{paper.deadline ? formatDate(paper.deadline) : 'No deadline set'}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Author</dt>

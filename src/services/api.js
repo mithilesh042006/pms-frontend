@@ -29,11 +29,12 @@ export const authAPI = {
 
 // Admin API
 export const adminAPI = {
-  getUsers: () => api.get('/admin/users'),
-  createUser: (userData) => api.post('/admin/users', userData),
-  updateUserStatus: (username, isActive) => api.put(`/admin/users/${username}/status`, { is_active: isActive }),
-  assignPaperwork: (paperworkData) => api.post('/admin/paperworks', paperworkData),
-  reviewPaperwork: (id, reviewData) => api.post(`/api/paperworks/${id}/review`, reviewData),
+  getUsers: () => api.get('/admin_app/users/'),
+  createUser: (userData) => api.post('/admin_app/createusers/', userData),
+  updateUserStatus: (username, status) => api.patch(`/admin_app/updateusers/${username}/status/`, { status }),
+  assignPaperwork: (paperworkData) => api.post('/admin_app/paperworks/', paperworkData),
+  updatePaperworkDeadline: (id, deadline) => api.patch(`/admin_app/paperworks/${id}/deadline/`, { deadline }),
+  reviewPaperwork: (id, reviewData) => api.post(`/paperworks/${id}/review/`, reviewData),
 };
 
 // Paperworks API
