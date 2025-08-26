@@ -12,6 +12,8 @@ const PaperAssignment = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showNewPaperModal, setShowNewPaperModal] = useState(false);
+  const [newPaperTitle, setNewPaperTitle] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -21,15 +23,63 @@ const PaperAssignment = () => {
     try {
       setLoading(true);
       const [papersResponse, usersResponse] = await Promise.all([
-        paperworksAPI.getPaperworks(),
+        paperworksAPI.getAllPaperworks(),
         adminAPI.getUsers()
       ]);
 
-      setPapers(papersResponse.data.results || []);
-      // Filter only researchers
-      const researchers = (usersResponse.data.results || []).filter(
-        user => user.role === 'RESEARCHER' && user.status === 'ACTIVE'
-      );
+      // Process papers data - handle both array and object with results property
+      let papersData = papersResponse.data;
+      if (Array.isArray(papersData)) {
+        // If response is already an array
+        setPapers(papersData);
+      } else if (papersData && papersData.results) {
+        // If response has a results property containing the array
+        setPapers(papersData.results);
+      } else {
+        // Fallback to empty array if structure is unexpected
+        setPapers([]);
+        console.error('Unexpected papers data structure:', papersResponse.data);
+      }
+      
+      // Process users data - handle both array and object with results property
+      let usersData = usersResponse.data;
+      if (Array.isArray(usersData)) {
+        // If response is already an array
+        usersData = usersData;
+      } else if (usersData && usersData.results) {
+        // If response has a results property containing the array
+        usersData = usersData.results;
+      } else {
+        // Fallback to empty array if structure is unexpected
+        usersData = [];
+        console.error('Unexpected users data structure:', usersResponse.data);
+      }
+      
+      // Filter only active researchers - handle different role field formats
+      const researchers = usersData.filter(user => {
+        // Check for role field in different formats (uppercase, lowercase, etc.)
+        const userRole = user.role || user.Role || '';
+        const userStatus = user.status || user.Status || '';
+        
+        // Log each user to debug
+        console.log('User data:', user);
+        
+        // Check if role contains 'researcher' in any case format
+        const isResearcher = 
+          userRole.toUpperCase() === 'RESEARCHER' || 
+          userRole === 'researcher' || 
+          userRole === 'Researcher';
+          
+        // Check if status contains 'active' in any case format
+        const isActive = 
+          userStatus.toUpperCase() === 'ACTIVE' || 
+          userStatus === 'active' || 
+          userStatus === 'Active';
+          
+        return isResearcher && isActive;
+      });
+      
+      console.log('Researchers found:', researchers);
       setUsers(researchers);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -46,20 +96,29 @@ const PaperAssignment = () => {
       toast.error('Please select both a paper and a researcher');
       return;
     }
+    
+    console.log('Assigning paper to user ID:', selectedUser);
 
     try {
       setAssigning(true);
-      await adminAPI.assignPaperwork({
+      const response = await adminAPI.assignPaperwork({
         title: selectedPaper.title,
         researcher_id: selectedUser,
         deadline: deadline || null
       });
       toast.success('Paper assigned successfully');
       
-      // Update local state
+      // Update local state with the response data
+      const updatedPaper = response.data;
       setPapers(papers.map(paper => 
         paper.id === selectedPaper.id 
-          ? { ...paper, assigned_to: selectedUser } 
+          ? { 
+              ...paper, 
+              assigned_to: updatedPaper.researcher ? updatedPaper.researcher.id : updatedPaper.researcher_id,
+              assigned_to_name: updatedPaper.researcher ? updatedPaper.researcher.username : updatedPaper.researcher_name,
+              status: updatedPaper.status,
+              deadline: updatedPaper.deadline
+            } 
           : paper
       ));
       
@@ -91,6 +150,57 @@ const PaperAssignment = () => {
     setSelectedPaper(null);
     setSelectedUser('');
     setDeadline('');
+  };
+
+  const openNewPaperModal = () => {
+    setShowNewPaperModal(true);
+    setNewPaperTitle('');
+    setSelectedUser('');
+    setDeadline('');
+  };
+
+  const closeNewPaperModal = () => {
+    setShowNewPaperModal(false);
+    setNewPaperTitle('');
+    setSelectedUser('');
+    setDeadline('');
+  };
+
+  const handleCreateNewPaper = async () => {
+    if (!newPaperTitle || !selectedUser) {
+      toast.error('Please enter a paper title and select a researcher');
+      return;
+    }
+
+    try {
+      setAssigning(true);
+      const response = await adminAPI.assignPaperwork({
+        title: newPaperTitle,
+        researcher_id: selectedUser,
+        deadline: deadline || null
+      });
+      
+      const newPaper = response.data;
+      
+      // Add the new paper to the papers list
+      setPapers([...papers, {
+        id: newPaper.id,
+        title: newPaper.title,
+        author_name: 'Admin Created',
+        status: newPaper.status,
+        assigned_to: newPaper.researcher ? newPaper.researcher.id : newPaper.researcher_id,
+        assigned_to_name: newPaper.researcher ? newPaper.researcher.username : newPaper.researcher_name,
+        deadline: newPaper.deadline
+      }]);
+      
+      toast.success('New paper created and assigned successfully');
+      closeNewPaperModal();
+    } catch (error) {
+      console.error('Error creating new paper:', error);
+      toast.error('Failed to create new paper');
+    } finally {
+      setAssigning(false);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -148,6 +258,12 @@ const PaperAssignment = () => {
             Back to Dashboard
           </Link>
           <button 
+            onClick={openNewPaperModal}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md mr-2"
+          >
+            Assign New Paper
+          </button>
+          <button 
             onClick={fetchData}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
           >
@@ -202,7 +318,6 @@ const PaperAssignment = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -215,9 +330,6 @@ const PaperAssignment = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{paper.title}</div>
                       <div className="text-xs text-gray-500">ID: {paper.id}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{paper.author_name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(paper.status)}
@@ -234,15 +346,7 @@ const PaperAssignment = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleOpenAssignModal(paper)}
-                        className="inline-flex items-center px-3 py-1.5 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors mr-2"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />
-                        </svg>
-                        {paper.assigned_to ? 'Reassign' : 'Assign'}
-                      </button>
+                      
                       <Link to={`/admin/papers/${paper.id}`} className="inline-flex items-center px-3 py-1.5 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -300,11 +404,24 @@ const PaperAssignment = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 >
                   <option value="">Select a researcher</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.username} ({user.email})
-                    </option>
-                  ))}
+                  {users.map((user) => {
+                    // Get user properties with fallbacks for different field names
+                    const userId = user.id || user.ID || user.userId || user.user_id || '';
+                    const username = user.username || user.Username || user.userName || user.user_name || 'Unknown';
+                    const email = user.email || user.Email || 'No email';
+                    const fullName = user.full_name || user.fullName || user.name || user.Name || '';
+                    
+                    // Create display text with available information
+                    let displayText = username;
+                    if (email) displayText += ` (${email})`;
+                    if (fullName && fullName !== username) displayText += ` - ${fullName}`;
+                    
+                    return (
+                      <option key={userId} value={userId}>
+                        {displayText}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               
@@ -342,6 +459,112 @@ const PaperAssignment = () => {
                     </svg>
                   )}
                   {assigning ? 'Assigning...' : 'Assign Paper'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Paper Assignment Modal */}
+      {showNewPaperModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Assign New Paper</h3>
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-gray-500"
+                  onClick={closeNewPaperModal}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="paperTitle" className="block text-sm font-medium text-gray-700 mb-1">
+                  Paper Title
+                </label>
+                <input
+                  type="text"
+                  id="paperTitle"
+                  value={newPaperTitle}
+                  onChange={(e) => setNewPaperTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Enter paper title"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="assignUser" className="block text-sm font-medium text-gray-700 mb-1">
+                  Assign to Researcher
+                </label>
+                <select
+                  id="assignUser"
+                  value={selectedUser}
+                  onChange={(e) => setSelectedUser(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">Select a researcher</option>
+                  {users.map((user) => {
+                    // Get user properties with fallbacks for different field names
+                    const userId = user.id || user.ID || user.userId || user.user_id || '';
+                    const username = user.username || user.Username || user.userName || user.user_name || 'Unknown';
+                    const email = user.email || user.Email || 'No email';
+                    const fullName = user.full_name || user.fullName || user.name || user.Name || '';
+                    
+                    // Create display text with available information
+                    let displayText = username;
+                    if (email) displayText += ` (${email})`;
+                    if (fullName && fullName !== username) displayText += ` - ${fullName}`;
+                    
+                    return (
+                      <option key={userId} value={userId}>
+                        {displayText}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              
+              <div className="mb-6">
+                <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-1">
+                  Set Deadline (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  id="deadline"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
+                  onClick={closeNewPaperModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+                  onClick={handleCreateNewPaper}
+                  disabled={assigning}
+                >
+                  {assigning && (
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {assigning ? 'Creating...' : 'Create and Assign Paper'}
                 </button>
               </div>
             </div>

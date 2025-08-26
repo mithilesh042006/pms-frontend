@@ -39,29 +39,29 @@ export const adminAPI = {
 
 // Paperworks API
 export const paperworksAPI = {
-  getAllPaperworks: () => api.get('/api/paperworks'),
-  getPaperworkById: (id) => api.get(`/api/paperworks/${id}`),
-  createPaperwork: (formData) => api.post('/api/paperworks', formData, {
+  getAllPaperworks: () => api.get('/api/paperworks/'),
+  getPaperworkById: (id) => api.get(`/api/paperworks/${id}/`),
+  createPaperwork: (formData) => api.post('/api/paperworks/', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   }),
-  submitVersion: (id, versionData) => api.post(`/api/paperworks/${id}/versions`, versionData),
-  getVersions: (id) => api.get(`/api/paperworks/${id}/versions`),
-  getVersionDetails: (id, versionId) => api.get(`/api/paperworks/${id}/versions/${versionId}`),
+  submitVersion: (id, versionData) => api.post(`/api/paperworks/${id}/versions/`, versionData),
+  getVersions: (id) => api.get(`/api/paperworks/${id}/versions/`),
+  getVersionDetails: (id, versionId) => api.get(`/api/paperworks/${id}/versions/${versionId}/`),
   downloadFile: (url) => api.get(url, { responseType: 'blob' }),
 };
 
 // Reports API
 export const reportsAPI = {
-  getSummary: () => api.get('/api/reports/summary'),
-  exportCSV: () => api.get('/api/reports/export-csv', { responseType: 'blob' }),
+  getSummary: () => api.get('/api/reports/summary/'),
+  exportCSV: () => api.get('/api/reports/export-csv/', { responseType: 'blob' }),
 };
 
 // Notifications API
 export const notificationsAPI = {
   getNotifications: () => api.get('/api/notifications/'),
-  markAsRead: (notificationId) => api.post(`/api/notifications/${notificationId}/read`)
+  markAsRead: (notificationId) => api.post(`/api/notifications/${notificationId}/read/`)
 };
 
 export default api;
