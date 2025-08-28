@@ -34,7 +34,7 @@ export const adminAPI = {
   updateUserStatus: (username, status) => api.patch(`/admin_app/updateusers/${username}/status/`, { status }),
   assignPaperwork: (paperworkData) => api.post('/admin_app/paperworks/', paperworkData),
   updatePaperworkDeadline: (id, deadline) => api.patch(`/admin_app/paperworks/${id}/deadline/`, { deadline }),
-  reviewPaperwork: (id, reviewData) => api.post(`/paperworks/${id}/review/`, reviewData),
+  reviewPaperwork: (id, reviewData) => api.post(`/admin_app/paperworks/${id}/review/`, reviewData),
 };
 
 // Paperworks API
@@ -46,10 +46,14 @@ export const paperworksAPI = {
       'Content-Type': 'multipart/form-data',
     },
   }),
-  submitVersion: (id, versionData) => api.post(`/api/paperworks/${id}/versions/`, versionData),
+  submitVersion: (id, formData) => api.post(`/api/paperworks/${id}/versions/`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   getVersions: (id) => api.get(`/api/paperworks/${id}/versions/`),
   getVersionDetails: (id, versionId) => api.get(`/api/paperworks/${id}/versions/${versionId}/`),
-  downloadFile: (url) => api.get(url, { responseType: 'blob' }),
+  downloadFile: (url) => api.get(url, { responseType: 'blob', headers: { 'Accept': 'application/octet-stream' } }),
 };
 
 // Reports API

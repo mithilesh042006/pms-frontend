@@ -19,6 +19,7 @@ import DeadlineManagement from '@/pages/admin/DeadlineManagement';
 
 // User Pages
 import UserDashboard from '@/pages/user/Dashboard';
+import PapersList from '@/pages/user/PapersList';
 import PaperworkDetail from '@/pages/paperworks/PaperworkDetail';
 import PaperworkSubmit from '@/pages/paperworks/PaperworkSubmit';
 import CreatePaperwork from '@/pages/user/CreatePaperwork';
@@ -28,8 +29,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Toaster position="top-right" />
-        <Layout>
-          <Routes>
+        <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -37,59 +37,88 @@ function App() {
           {/* Protected admin routes */}
           <Route path="/admin" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <AdminDashboard />
+              <Layout>
+                <AdminDashboard />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/users" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <UserManagement />
+              <Layout>
+                <UserManagement />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/users/create" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <CreateUser />
+              <Layout>
+                <CreateUser />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/users/:userId" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <UserDetail />
+              <Layout>
+                <UserDetail />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/papers" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <PaperAssignment />
+              <Layout>
+                <PaperAssignment />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/papers/:paperId" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <PaperReview />
+              <Layout>
+                <PaperReview />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/admin/papers/:paperId/deadline" element={
             <ProtectedRoute requiredRole="ADMIN">
-              <DeadlineManagement />
+              <Layout>
+                <DeadlineManagement />
+              </Layout>
             </ProtectedRoute>
           } />
           
           {/* Protected user routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute requiredRole="RESEARCHER">
-              <UserDashboard />
+              <Layout>
+                <UserDashboard />
+              </Layout>
             </ProtectedRoute>
           } />
-          <Route path="/papers/:paperId" element={
+          <Route path="/papers" element={
             <ProtectedRoute requiredRole="RESEARCHER">
-              <PaperworkDetail />
+              <Layout>
+                <PapersList />
+              </Layout>
             </ProtectedRoute>
           } />
-          <Route path="/papers/:paperId/submit" element={
+          <Route path="/papers/:id" element={
             <ProtectedRoute requiredRole="RESEARCHER">
-              <PaperworkSubmit />
+              <Layout>
+                <PaperworkDetail />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/papers/:id/submit" element={
+            <ProtectedRoute requiredRole="RESEARCHER">
+              <Layout>
+                <PaperworkSubmit />
+              </Layout>
             </ProtectedRoute>
           } />
           <Route path="/papers/create" element={
             <ProtectedRoute requiredRole="RESEARCHER">
-              <CreatePaperwork />
+              <Layout>
+                <CreatePaperwork />
+              </Layout>
             </ProtectedRoute>
           } />
           
@@ -99,7 +128,6 @@ function App() {
           {/* Catch all route - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-        </Layout>
       </AuthProvider>
     </Router>
   );

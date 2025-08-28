@@ -13,7 +13,6 @@ const Sidebar = () => {
     { path: '/admin', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { path: '/admin/users', label: 'User Management', icon: <Users size={20} /> },
     { path: '/admin/papers', label: 'Paper Assignment', icon: <FileText size={20} /> },
-    { path: '/admin/papers/review', label: 'Paper Review', icon: <FileText size={20} /> },
     // { path: '/admin/deadlines', label: 'Deadlines', icon: <Clock size={20} /> },
   ];
 

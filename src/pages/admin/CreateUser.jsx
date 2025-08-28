@@ -10,7 +10,6 @@ const CreateUser = () => {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
     role: '',
     status: 'ACTIVE'
   });
@@ -23,49 +22,55 @@ const CreateUser = () => {
     });
   };
 
-  const validateForm = () => {
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return false;
-    }
+  // const validateForm = () => {
+  //   if (formData.password !== formData.confirmPassword) {
+  //     toast.error('Passwords do not match');
+  //     return false;
+  //   }
     
-    if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters long');
-      return false;
-    }
+  //   if (formData.password.length < 8) {
+  //     toast.error('Password must be at least 8 characters long');
+  //     return false;
+  //   }
     
-    return true;
-  };
+  //   return true;
+  // };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
+  e.preventDefault();
+
+  const validateForm = () => {
+  if (formData.password.length < 8) {
+    toast.error('Password must be at least 8 characters long');
+    return false;
+  }
+  
+  return true;
+};
+
+
+  try {
+    setLoading(true);
+
+    // Extract only required fields
+    const { username, email, password, role } = formData;
+
+    await adminAPI.createUser({ username, email, password, role });
+    toast.success('User created successfully');
+    navigate('/admin/users');
+  } catch (error) {
+    console.error('Error creating user:', error);
+    if (error.response && error.response.data) {
+      const errorMessage = error.response.data.message || 'Failed to create user';
+      toast.error(errorMessage);
+    } else {
+      toast.error('Failed to create user');
     }
-    
-    try {
-      setLoading(true);
-      
-      // Remove confirmPassword before sending to API
-      const { confirmPassword, ...userData } = formData;
-      
-      await adminAPI.createUser(userData);
-      toast.success('User created successfully');
-      navigate('/admin/users');
-    } catch (error) {
-      console.error('Error creating user:', error);
-      if (error.response && error.response.data) {
-        // Display specific error messages from the backend if available
-        const errorMessage = error.response.data.message || 'Failed to create user';
-        toast.error(errorMessage);
-      } else {
-        toast.error('Failed to create user');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -123,10 +128,10 @@ const CreateUser = () => {
                 required
                 minLength="8"
               />
-              <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters long</p>
+              {/* <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters long</p> */}
             </div>
 
-            <div>
+            {/* <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password *
               </label>
@@ -139,7 +144,7 @@ const CreateUser = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
-            </div>
+            </div> */}
 
             <div>
               <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
@@ -159,7 +164,7 @@ const CreateUser = () => {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                 Status *
               </label>
@@ -175,7 +180,7 @@ const CreateUser = () => {
                 <option value="INACTIVE">Inactive</option>
                 <option value="FROZEN">Frozen</option>
               </select>
-            </div>
+            </div> */}
           </div>
 
           <div className="mt-8 flex justify-end">

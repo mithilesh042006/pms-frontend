@@ -23,11 +23,11 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   // If role is required and user doesn't have it, redirect to appropriate dashboard
   if (requiredRole && user?.role !== requiredRole) {
-    // toast.error('You do not have permission to access this page');
+    toast.error('You do not have permission to access this page');
     console.log('user role', user?.role);
     console.log('required role', requiredRole);
     // Redirect admin to admin dashboard if trying to access user routes
-    if (user?.role === 'admin') {
+    if (user?.role === 'ADMIN') {
       return <Navigate to="/admin" replace />;
     }
     // Redirect regular users to user dashboard if trying to access admin routes

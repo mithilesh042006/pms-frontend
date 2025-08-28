@@ -59,14 +59,14 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
           <p className="text-gray-500 mt-1">Overview of research paper management system</p>
         </div>
-        <Button variant="outline" onClick={handleExportCSV} className="flex items-center gap-2">
+        {/* <Button variant="outline" onClick={handleExportCSV} className="flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           Export Report
-        </Button>
+        </Button> */}
       </div>
 
       {/* Stats Cards */}
@@ -125,9 +125,9 @@ const AdminDashboard = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Recent Papers</h2>
-          <Button variant="link" onClick={() => window.location.href = '/admin/papers/review'} className="text-blue-600 hover:text-blue-800 p-0">
+          {/* <Button variant="link" onClick={() => window.location.href = '/admin/papers/review'} className="text-blue-600 hover:text-blue-800 p-0">
             View All Papers
-          </Button>
+          </Button> */}
         </div>
         <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">

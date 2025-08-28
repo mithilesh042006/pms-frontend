@@ -23,7 +23,8 @@ const PaperworkDetail = () => {
 
         // Fetch versions
         const versionsResponse = await paperworksAPI.getVersions(id);
-        setVersions(versionsResponse.data.results || []);
+setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versionsResponse.data.results || []);
+
       } catch (error) {
         console.error('Error fetching paperwork data:', error);
         toast.error('Failed to load paperwork details');
@@ -35,16 +36,29 @@ const PaperworkDetail = () => {
     fetchPaperworkData();
   }, [id]);
 
-  const handleDownload = async (url, filename) => {
+  const handleDownload = async (filePath, filename) => {
     try {
-      const response = await paperworksAPI.downloadFile(url);
+      // Create the full API URL for the file download
+      const apiUrl = `/api/download/${filePath}`;
+      
+      // Use the paperworksAPI to download the file
+      const response = await paperworksAPI.downloadFile(apiUrl);
+      
+      // Create a blob URL from the response data
       const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Create a temporary link element to trigger the download
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
+      
+      // Clean up
       link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast.success(`Downloading ${filename}`);
     } catch (error) {
       console.error('Error downloading file:', error);
       toast.error('Failed to download file');
@@ -314,7 +328,7 @@ const PaperworkDetail = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Version {version.version_number}
+                            Version {version.version_no}
                             {index === 0 && (
                               <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
                                 Latest
@@ -325,30 +339,78 @@ const PaperworkDetail = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            Submitted on {formatDate(version.created_at)}
+                            Submitted on {formatDate(version.submitted_at)}
                           </p>
                           <div className="mt-2">{getStatusBadge(version.status)}</div>
                         </div>
-                        <button
-                          onClick={() => handleDownload(version.file_url, `${paperwork.title}_v${version.version_number}.pdf`)}
-                          className="text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-md transition-colors duration-200"
-                        >
-                          <span className="mr-1 font-medium">Download</span>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                            />
-                          </svg>
-                        </button>
+                        {/* <div className="flex space-x-2">
+                          {version.pdf_path && (
+                            <button
+                              onClick={() => handleDownload(version.pdf_path, `${paperwork.title}_v${version.version_number}.pdf`)}
+                              className="text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-md transition-colors duration-200"
+                            >
+                              <span className="mr-1 font-medium">PDF</span>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          {version.latex_path && (
+                            <button
+                              onClick={() => handleDownload(version.latex_path, `${paperwork.title}_v${version.version_number}_latex.zip`)}
+                              className="text-green-600 hover:text-green-800 flex items-center bg-green-50 hover:bg-green-100 px-3 py-2 rounded-md transition-colors duration-200"
+                            >
+                              <span className="mr-1 font-medium">LaTeX</span>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          {version.python_path && (
+                            <button
+                              onClick={() => handleDownload(version.python_path, `${paperwork.title}_v${version.version_number}_python.zip`)}
+                              className="text-yellow-600 hover:text-yellow-800 flex items-center bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-md transition-colors duration-200"
+                            >
+                              <span className="mr-1 font-medium">Python</span>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </div> */}
                       </div>
                       {version.comments && (
                         <div className="mt-4 border-t border-gray-100 pt-4">

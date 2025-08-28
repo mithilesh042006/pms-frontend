@@ -28,18 +28,26 @@ const PaperAssignment = () => {
       ]);
 
       // Process papers data - handle both array and object with results property
-      let papersData = papersResponse.data;
-      if (Array.isArray(papersData)) {
-        // If response is already an array
-        setPapers(papersData);
-      } else if (papersData && papersData.results) {
-        // If response has a results property containing the array
-        setPapers(papersData.results);
-      } else {
-        // Fallback to empty array if structure is unexpected
-        setPapers([]);
-        console.error('Unexpected papers data structure:', papersResponse.data);
-      }
+      // Process papers data - handle both array and object with results property
+let papersData = papersResponse.data;
+if (Array.isArray(papersData)) {
+  papersData = papersData;
+} else if (papersData && papersData.results) {
+  papersData = papersData.results;
+} else {
+  papersData = [];
+  console.error('Unexpected papers data structure:', papersResponse.data);
+}
+
+// 🔥 Normalize papers to include assigned_to and assigned_to_name
+const normalizedPapers = papersData.map(paper => ({
+  ...paper,
+  assigned_to: paper.researcher ? paper.researcher.id : null,
+  assigned_to_name: paper.researcher ? paper.researcher.username : null
+}));
+
+setPapers(normalizedPapers);
+
       
       // Process users data - handle both array and object with results property
       let usersData = usersResponse.data;
