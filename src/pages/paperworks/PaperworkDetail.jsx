@@ -303,132 +303,49 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
               </h2>
               
               {versions.length === 0 ? (
-                <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p className="text-gray-500 mt-4">No versions have been submitted yet.</p>
-                  <button
-                    onClick={() => navigate(`/papers/${id}/submit`)}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Submit First Version
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {versions.map((version, index) => (
-                    <div key={version.id} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-lg font-semibold flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Version {version.version_no}
-                            {index === 0 && (
-                              <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                                Latest
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-sm text-gray-500 flex items-center mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Submitted on {formatDate(version.submitted_at)}
-                          </p>
-                          <div className="mt-2">{getStatusBadge(version.status)}</div>
-                        </div>
-                        {/* <div className="flex space-x-2">
-                          {version.pdf_path && (
-                            <button
-                              onClick={() => handleDownload(version.pdf_path, `${paperwork.title}_v${version.version_number}.pdf`)}
-                              className="text-blue-600 hover:text-blue-800 flex items-center bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-md transition-colors duration-200"
-                            >
-                              <span className="mr-1 font-medium">PDF</span>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                />
-                              </svg>
-                            </button>
-                          )}
-                          {version.latex_path && (
-                            <button
-                              onClick={() => handleDownload(version.latex_path, `${paperwork.title}_v${version.version_number}_latex.zip`)}
-                              className="text-green-600 hover:text-green-800 flex items-center bg-green-50 hover:bg-green-100 px-3 py-2 rounded-md transition-colors duration-200"
-                            >
-                              <span className="mr-1 font-medium">LaTeX</span>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                />
-                              </svg>
-                            </button>
-                          )}
-                          {version.python_path && (
-                            <button
-                              onClick={() => handleDownload(version.python_path, `${paperwork.title}_v${version.version_number}_python.zip`)}
-                              className="text-yellow-600 hover:text-yellow-800 flex items-center bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-md transition-colors duration-200"
-                            >
-                              <span className="mr-1 font-medium">Python</span>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                />
-                              </svg>
-                            </button>
-                          )}
-                        </div> */}
-                      </div>
-                      {version.comments && (
-                        <div className="mt-4 border-t border-gray-100 pt-4">
-                          <h4 className="text-sm font-medium text-gray-700 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            Comments:
-                          </h4>
-                          <p className="text-sm mt-2 bg-gray-50 p-4 rounded-md border border-gray-100">
-                            {version.comments || 'No comments provided'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+  <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm text-center">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <p className="text-gray-500 mt-4">No versions have been submitted yet.</p>
+    <button
+      onClick={() => navigate(`/papers/${id}/submit`)}
+      className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      </svg>
+      Submit First Version
+    </button>
+  </div>
+) : (
+  <div className="space-y-4">
+    {versions.map((version, index) => (
+      <div key={version.id} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-lg font-semibold">Version {version.version_no}</h3>
+            <p className="text-sm text-gray-500">Submitted on {formatDate(version.submitted_at)}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+
+    {/* 👇 Always show this button for more versions */}
+    <div className="mt-6 text-center">
+      <button
+        onClick={() => navigate(`/papers/${id}/submit`)}
+        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        Submit Another Version
+      </button>
+    </div>
+  </div>
+)}
+
             </div>
           )}
 

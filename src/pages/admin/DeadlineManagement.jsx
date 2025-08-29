@@ -57,7 +57,7 @@ const DeadlineManagement = () => {
       });
       
       // Navigate back to the paper details
-      navigate(`/papers/${paperId}`);
+      navigate(`/admin/papers/${paperId}`);
     } catch (error) {
       console.error('Error updating deadline:', error);
       toast.error('Failed to update deadline');

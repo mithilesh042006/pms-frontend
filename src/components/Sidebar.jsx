@@ -26,7 +26,7 @@ const Sidebar = () => {
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-md z-10 border-r border-gray-200">
       <div className="p-6 border-b border-gray-200">
-        <Link to={isAdmin ? '/admin' : '/dashboard'} className="text-xl font-bold text-blue-600">RPMS</Link>
+        <Link to={isAdmin ? '/admin' : '/dashboard'} className="text-xl font-bold text-blue-600">PMS</Link>
       </div>
       
       <div className="px-4 py-6">

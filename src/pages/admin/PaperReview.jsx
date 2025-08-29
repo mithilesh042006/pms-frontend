@@ -27,12 +27,18 @@ const PaperReview = () => {
       ]);
 
       setPaper(paperResponse.data);
-      setVersions(versionsResponse.data.results || []);
-      
-      // Select the latest version by default
-      if (versionsResponse.data.results && versionsResponse.data.results.length > 0) {
-        const latestVersion = versionsResponse.data.results.sort((a, b) => 
-          new Date(b.created_at) - new Date(a.created_at)
+
+      // Normalize API response
+      const versionsData = Array.isArray(versionsResponse.data)
+        ? versionsResponse.data
+        : versionsResponse.data.results || [];
+
+      setVersions(versionsData);
+
+      // Select latest version
+      if (versionsData.length > 0) {
+        const latestVersion = [...versionsData].sort(
+          (a, b) => new Date(b.submitted_at) - new Date(a.submitted_at)
         )[0];
         setSelectedVersion(latestVersion);
       }
@@ -44,18 +50,15 @@ const PaperReview = () => {
     }
   };
 
-  const handleDownload = async (versionId, fileName) => {
+  const handleDownload = async (filePath, filename) => {
     try {
-      const response = await paperworksAPI.downloadFile(versionId);
-      
-      // Create a blob from the response data
+      const response = await paperworksAPI.downloadFile(filePath);
+
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
-      
-      // Create a link element and trigger download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', fileName || 'paper.pdf');
+      link.setAttribute('download', filename || 'file');
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -68,12 +71,12 @@ const PaperReview = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!decision) {
       toast.error('Please select a decision (Approve or Reject)');
       return;
     }
-    
+
     try {
       setSubmitting(true);
       await adminAPI.reviewPaperwork(paperId, {
@@ -81,20 +84,17 @@ const PaperReview = () => {
         feedback,
         version_id: selectedVersion?.id
       });
-      
+
       toast.success(`Paper ${decision.toLowerCase()}d successfully`);
-      
-      // Update local state
+
       setPaper({
         ...paper,
         status: decision
       });
-      
-      // Reset form
+
       setFeedback('');
       setDecision('');
-      
-      // Refresh data
+
       fetchPaperDetails();
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -110,14 +110,19 @@ const PaperReview = () => {
 
   const getStatusBadge = (status) => {
     const statusClasses = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'APPROVED': 'bg-green-100 text-green-800',
-      'REJECTED': 'bg-red-100 text-red-800',
-      'DRAFT': 'bg-gray-100 text-gray-800'
+      PENDING: 'bg-yellow-100 text-yellow-800',
+      APPROVED: 'bg-green-100 text-green-800',
+      REJECTED: 'bg-red-100 text-red-800',
+      SUBMITTED: 'bg-blue-100 text-blue-800',
+      DRAFT: 'bg-gray-100 text-gray-800'
     };
 
     return (
-      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span
+        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+          statusClasses[status] || 'bg-gray-100 text-gray-800'
+        }`}
+      >
         {status}
       </span>
     );
@@ -137,7 +142,10 @@ const PaperReview = () => {
         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
           <p>Paper not found or you don't have permission to view this paper.</p>
         </div>
-        <Link to="/admin/papers" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">
+        <Link
+          to="/admin/papers"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+        >
           Back to Papers
         </Link>
       </div>
@@ -149,10 +157,16 @@ const PaperReview = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Paper Review</h1>
         <div className="flex space-x-4">
-          <Link to={`/admin/papers/${paperId}/deadline`} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md">
+          <Link
+            to={`/admin/papers/${paperId}/deadline`}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md"
+          >
             Update Deadline
           </Link>
-          <Link to="/admin/papers" className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">
+          <Link
+            to="/admin/papers"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+          >
             Back to Papers
           </Link>
         </div>
@@ -169,27 +183,27 @@ const PaperReview = () => {
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Deadline</dt>
-                <dd className="mt-1 text-sm text-gray-900">{paper.deadline ? formatDate(paper.deadline) : 'No deadline set'}</dd>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {paper.deadline ? formatDate(paper.deadline) : 'No deadline set'}
+                </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Author</dt>
-                <dd className="mt-1 text-sm text-gray-900">{paper.author_name}</dd>
+                <dt className="text-sm font-medium text-gray-500">Researcher</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {paper.researcher?.username} ({paper.researcher?.email})
+                </dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Status</dt>
                 <dd className="mt-1 text-sm text-gray-900">{getStatusBadge(paper.status)}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Created At</dt>
-                <dd className="mt-1 text-sm text-gray-900">{formatDate(paper.created_at)}</dd>
+                <dt className="text-sm font-medium text-gray-500">Assigned At</dt>
+                <dd className="mt-1 text-sm text-gray-900">{formatDate(paper.assigned_at)}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
                 <dd className="mt-1 text-sm text-gray-900">{formatDate(paper.updated_at)}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
-                <dd className="mt-1 text-sm text-gray-900">{paper.assigned_to_name || 'Not assigned'}</dd>
               </div>
             </dl>
           </div>
@@ -199,28 +213,80 @@ const PaperReview = () => {
             {versions.length > 0 ? (
               <div className="space-y-4">
                 {versions.map((version) => (
-                  <div 
-                    key={version.id} 
-                    className={`p-4 border rounded-md ${selectedVersion?.id === version.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                  <div
+                    key={version.id}
+                    className={`p-4 border rounded-md cursor-pointer ${
+                      selectedVersion?.id === version.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200'
+                    }`}
                     onClick={() => setSelectedVersion(version)}
                   >
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">Version {version.version_number}</span>
-                      <span className="text-sm text-gray-500">{formatDate(version.created_at)}</span>
+                      <span className="font-medium">Version {version.version_no}</span>
+                      <span className="text-sm text-gray-500">
+                        {formatDate(version.submitted_at)}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-700 mb-2">{version.comment || 'No comment provided'}</p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(version.id, `${paper.title}_v${version.version_number}.pdf`);
-                      }}
-                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
-                    >
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                      </svg>
-                      Download File
-                    </button>
+
+                    <div className="flex flex-col space-y-2">
+                      {version.pdf_path && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(
+                              version.pdf_path,
+                              `${paper.title}_v${version.version_no}.pdf`
+                            );
+                          }}
+                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                        >
+                          📄 Download PDF
+                        </button>
+                      )}
+                      {version.latex_path && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(
+                              version.latex_path,
+                              `latex_v${version.version_no}.tex`
+                            );
+                          }}
+                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                        >
+                          📝 Download LaTeX
+                        </button>
+                      )}
+                      {version.python_path && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(
+                              version.python_path,
+                              `code_v${version.version_no}.zip`
+                            );
+                          }}
+                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                        >
+                          🐍 Download Code
+                        </button>
+                      )}
+                      {version.docx_path && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(
+                              version.docx_path,
+                              `docx_v${version.version_no}.docx`
+                            );
+                          }}
+                          className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                        >
+                          📘 Download DOCX
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -236,7 +302,10 @@ const PaperReview = () => {
           <h2 className="text-xl font-semibold mb-4">Review Paper</h2>
           <form onSubmit={handleReviewSubmit}>
             <div className="mb-6">
-              <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="feedback"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Feedback
               </label>
               <textarea
@@ -292,9 +361,25 @@ const PaperReview = () => {
                 disabled={submitting || !selectedVersion}
               >
                 {submitting && (
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                 )}
                 {submitting ? 'Submitting...' : 'Submit Review'}
@@ -321,7 +406,9 @@ const PaperReview = () => {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-500">Feedback: </span>
-                    <p className="text-sm text-gray-700 mt-1">{review.feedback || 'No feedback provided'}</p>
+                    <p className="text-sm text-gray-700 mt-1">
+                      {review.feedback || 'No feedback provided'}
+                    </p>
                   </div>
                 </div>
               ))}
