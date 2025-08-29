@@ -23,7 +23,7 @@ const PaperReview = () => {
       setLoading(true);
       const [paperResponse, versionsResponse] = await Promise.all([
         paperworksAPI.getPaperworkById(paperId),
-        paperworksAPI.getPaperworkVersions(paperId)
+        paperworksAPI.getVersions(paperId)
       ]);
 
       setPaper(paperResponse.data);
