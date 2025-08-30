@@ -67,15 +67,15 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
 
   const getStatusBadge = (status) => {
     const statusClasses = {
-      'PENDING': 'bg-yellow-100 text-yellow-800',
-      'APPROVED': 'bg-green-100 text-green-800',
-      'REJECTED': 'bg-red-100 text-red-800',
-      'SUBMITTED': 'bg-blue-100 text-blue-800',
-      'CHANGES_REQUESTED': 'bg-orange-100 text-orange-800'
+      'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      'APPROVED': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'REJECTED': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      'SUBMITTED': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      'CHANGES_REQUESTED': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
     };
 
     return (
-      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClasses[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}`}>
         {status}
       </span>
     );
@@ -87,16 +87,16 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
       </div>
     );
   }
 
   if (!paperwork) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded">
+      <div className="container mx-auto px-4 py-8 dark:bg-gray-900">
+        <div className="bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 p-4 rounded">
           Paperwork not found or you don't have permission to view it.
         </div>
       </div>
@@ -157,12 +157,12 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8 border border-gray-200">
-        <div className="border-b border-gray-200 bg-gray-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <nav className="-mb-px flex">
             <button
               onClick={() => setActiveTab('details')}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'details' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'details' ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${activeTab === 'details' ? 'text-blue-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -171,7 +171,7 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
             </button>
             <button
               onClick={() => setActiveTab('versions')}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'versions' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'versions' ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${activeTab === 'versions' ? 'text-blue-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -180,7 +180,7 @@ setVersions(Array.isArray(versionsResponse.data) ? versionsResponse.data : versi
             </button>
             <button
               onClick={() => setActiveTab('feedback')}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'feedback' ? 'border-blue-500 text-blue-600 bg-white' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'feedback' ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 mr-2 ${activeTab === 'feedback' ? 'text-blue-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />

@@ -18,19 +18,15 @@ const PaperworkSubmit = () => {
     python_zip: null,
   });
 
-  // Fetch paperwork + versions
   useEffect(() => {
     const fetchPaperwork = async () => {
       try {
         setLoading(true);
-        console.log('Fetching paperwork with ID:', id);
         const response = await paperworksAPI.getPaperworkById(id);
         setPaperwork(response.data);
 
-        // fetch versions list
         const versionsRes = await paperworksAPI.getVersions(id);
         if (versionsRes.data && versionsRes.data.length > 0) {
-          // pick max version_no
           const maxVersion = Math.max(
             ...versionsRes.data.map(v => parseInt(v.version_no, 10) || 0)
           );
@@ -39,12 +35,6 @@ const PaperworkSubmit = () => {
         } else {
           setFormData(prev => ({ ...prev, version_no: '01' }));
         }
-
-        // Optional authorization check:
-        // if (response.data.researcher_id !== user.id && user.role !== 'ADMIN') {
-        //   toast.error('You are not authorized to submit for this paperwork');
-        //   navigate(-1);
-        // }
       } catch (error) {
         console.error('Error fetching paperwork:', error);
         toast.error('Failed to load paperwork details');
@@ -82,7 +72,6 @@ const PaperworkSubmit = () => {
       if (formData.python_zip) submitFormData.append('python_zip', formData.python_zip);
       submitFormData.append('version_no', formData.version_no);
 
-      console.log('Submitting version with data:', formData);
       await paperworksAPI.submitVersion(id, submitFormData);
 
       toast.success('Version submitted successfully');
@@ -107,28 +96,32 @@ const PaperworkSubmit = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Submit New Version</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Submit New Version</h1>
           <button
             onClick={() => navigate(-1)}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+            className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 text-gray-800 px-4 py-2 rounded-md"
           >
             Cancel
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Paper Details</h2>
-            <div className="bg-gray-50 p-4 rounded">
-              <p><span className="font-medium">Title:</span> {paperwork.title}</p>
-              <p className="mt-2"><span className="font-medium">Current Status:</span> {paperwork.status}</p>
+            <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Paper Details</h2>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded">
+              <p className="text-gray-800 dark:text-gray-200">
+                <span className="font-medium">Title:</span> {paperwork.title}
+              </p>
+              <p className="mt-2 text-gray-800 dark:text-gray-200">
+                <span className="font-medium">Current Status:</span> {paperwork.status}
+              </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit}>
             {/* Version No (auto) */}
             <div className="mb-6">
-              <label htmlFor="version_no" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="version_no" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Version Number
               </label>
               <input
@@ -137,13 +130,13 @@ const PaperworkSubmit = () => {
                 name="version_no"
                 value={formData.version_no}
                 readOnly
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm bg-gray-100 dark:bg-gray-700 dark:text-gray-200"
               />
             </div>
 
             {/* PDF Upload */}
             <div className="mb-6">
-              <label htmlFor="paper_pdf" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="paper_pdf" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Upload Paper (PDF only) *
               </label>
               <input
@@ -152,16 +145,17 @@ const PaperworkSubmit = () => {
                 name="paper_pdf"
                 accept=".pdf"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500
+                className="block w-full text-sm text-gray-500 dark:text-gray-300
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-md file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+                  file:bg-blue-50 dark:file:bg-gray-700 
+                  file:text-blue-700 dark:file:text-gray-200
+                  hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
                 required
               />
               {formData.paper_pdf && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   Selected file: {formData.paper_pdf.name} ({Math.round(formData.paper_pdf.size / 1024)} KB)
                 </p>
               )}
@@ -169,7 +163,7 @@ const PaperworkSubmit = () => {
 
             {/* LaTeX Upload */}
             <div className="mb-6">
-              <label htmlFor="latex_tex" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="latex_tex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Upload LaTeX Files (TEX)
               </label>
               <input
@@ -178,15 +172,16 @@ const PaperworkSubmit = () => {
                 name="latex_tex"
                 accept=".tex"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500
+                className="block w-full text-sm text-gray-500 dark:text-gray-300
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-md file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+                  file:bg-blue-50 dark:file:bg-gray-700 
+                  file:text-blue-700 dark:file:text-gray-200
+                  hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
               />
               {formData.latex_tex && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   Selected file: {formData.latex_tex.name} ({Math.round(formData.latex_tex.size / 1024)} KB)
                 </p>
               )}
@@ -194,7 +189,7 @@ const PaperworkSubmit = () => {
 
             {/* Python ZIP Upload */}
             <div className="mb-6">
-              <label htmlFor="python_zip" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="python_zip" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Upload Python Code (ZIP)
               </label>
               <input
@@ -203,15 +198,16 @@ const PaperworkSubmit = () => {
                 name="python_zip"
                 accept=".zip"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500
+                className="block w-full text-sm text-gray-500 dark:text-gray-300
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-md file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+                  file:bg-blue-50 dark:file:bg-gray-700 
+                  file:text-blue-700 dark:file:text-gray-200
+                  hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
               />
               {formData.python_zip && (
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   Selected file: {formData.python_zip.name} ({Math.round(formData.python_zip.size / 1024)} KB)
                 </p>
               )}

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 
@@ -27,9 +28,10 @@ import CreatePaperwork from '@/pages/user/CreatePaperwork';
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Toaster position="top-right" />
-        <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Toaster position="top-right" />
+          <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -127,8 +129,9 @@ function App() {
           
           {/* Catch all route - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }
