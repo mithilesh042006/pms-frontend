@@ -35,6 +35,8 @@ export const adminAPI = {
   assignPaperwork: (paperworkData) => api.post('/admin_app/paperworks/', paperworkData),
   updatePaperworkDeadline: (id, deadline) => api.patch(`/admin_app/paperworks/${id}/deadline/`, { deadline }),
   reviewPaperwork: (id, reviewData) => api.post(`/admin_app/paperworks/${id}/review/`, reviewData),
+  getPaperworkById: (id) => api.get(`/api/paperworks/${id}/`),
+  getPaperworkVersions: (id) => api.get(`/api/paperworks/${id}/versions/`),
 };
 
 // Paperworks API

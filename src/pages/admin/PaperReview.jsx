@@ -206,46 +206,93 @@ const PaperReview = () => {
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
                         : 'border-gray-200 dark:border-gray-600'
                     }`}
-                    onClick={() => setSelectedVersion(version)}
+                    onClick={() => {
+                      setSelectedVersion(version);
+                      navigate(`/admin/papers/${paperId}/versions/${version.version_no}`);
+                    }}
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-gray-900 dark:text-white">Version {version.version_no}</span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">{formatDate(version.submitted_at)}</span>
                     </div>
-                    <div className="flex flex-col space-y-2">
+                    {/* <div className="flex flex-col space-y-2">
                       {version.pdf_path && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDownload(version.pdf_path, `${paper.title}_v${version.version_no}.pdf`); }}
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
-                        >
-                          📄 Download PDF
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDownload(version.pdf_path, `${paper.title}_v${version.version_no}.pdf`); }}
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
+                          >
+                            📄 Download PDF
+                          </button>
+                          <a
+                            href={`/admin_app/paperworks/${paperId}/versions/${version.version_no}/pdf/view/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-green-600 dark:text-green-400 hover:underline text-sm flex items-center"
+                          >
+                            👁️ View PDF
+                          </a>
+                        </div>
                       )}
                       {version.latex_path && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDownload(version.latex_path, `latex_v${version.version_no}.tex`); }}
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
-                        >
-                          📝 Download LaTeX
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDownload(version.latex_path, `latex_v${version.version_no}.tex`); }}
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
+                          >
+                            📝 Download LaTeX
+                          </button>
+                          <a
+                            href={`/admin_app/paperworks/${paperId}/versions/${version.version_no}/latex/view/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-green-600 dark:text-green-400 hover:underline text-sm flex items-center"
+                          >
+                            👁️ View LaTeX
+                          </a>
+                        </div>
                       )}
                       {version.python_path && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDownload(version.python_path, `code_v${version.version_no}.zip`); }}
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
-                        >
-                          🐍 Download Code
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDownload(version.python_path, `code_v${version.version_no}.zip`); }}
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
+                          >
+                            🐍 Download Code
+                          </button>
+                          <a
+                            href={`/admin_app/paperworks/${paperId}/versions/${version.version_no}/python/view/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-green-600 dark:text-green-400 hover:underline text-sm flex items-center"
+                          >
+                            👁️ View Code
+                          </a>
+                        </div>
                       )}
                       {version.docx_path && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDownload(version.docx_path, `docx_v${version.version_no}.docx`); }}
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
-                        >
-                          📘 Download DOCX
-                        </button>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDownload(version.docx_path, `docx_v${version.version_no}.docx`); }}
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-sm flex items-center"
+                          >
+                            📘 Download DOCX
+                          </button>
+                          <a
+                            href={`/admin_app/paperworks/${paperId}/versions/${version.version_no}/docx/view/`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-green-600 dark:text-green-400 hover:underline text-sm flex items-center"
+                          >
+                            👁️ View DOCX
+                          </a>
+                        </div>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
               </div>

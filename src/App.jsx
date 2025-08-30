@@ -16,6 +16,7 @@ import UserDetail from '@/pages/admin/UserDetail';
 import CreateUser from '@/pages/admin/CreateUser';
 import PaperAssignment from '@/pages/admin/PaperAssignment';
 import PaperReview from '@/pages/admin/PaperReview';
+import VersionDetail from '@/pages/admin/VersionDetail';
 import DeadlineManagement from '@/pages/admin/DeadlineManagement';
 
 // User Pages
@@ -76,6 +77,13 @@ function App() {
             <ProtectedRoute requiredRole="ADMIN">
               <Layout>
                 <PaperReview />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/papers/:paperId/versions/:versionNo" element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <Layout>
+                <VersionDetail />
               </Layout>
             </ProtectedRoute>
           } />

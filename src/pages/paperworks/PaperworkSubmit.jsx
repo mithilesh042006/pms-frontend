@@ -16,6 +16,7 @@ const PaperworkSubmit = () => {
     paper_pdf: null,
     latex_tex: null,
     python_zip: null,
+    docx_file: null,
   });
 
   useEffect(() => {
@@ -49,10 +50,12 @@ const PaperworkSubmit = () => {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files[0],
-    }));
+    if (files && files[0]) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: files[0],
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -70,6 +73,7 @@ const PaperworkSubmit = () => {
       if (formData.paper_pdf) submitFormData.append('paper_pdf', formData.paper_pdf);
       if (formData.latex_tex) submitFormData.append('latex_tex', formData.latex_tex);
       if (formData.python_zip) submitFormData.append('python_zip', formData.python_zip);
+      if (formData.docx_file) submitFormData.append('docx_file', formData.docx_file);
       submitFormData.append('version_no', formData.version_no);
 
       await paperworksAPI.submitVersion(id, submitFormData);
@@ -209,6 +213,32 @@ const PaperworkSubmit = () => {
               {formData.python_zip && (
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   Selected file: {formData.python_zip.name} ({Math.round(formData.python_zip.size / 1024)} KB)
+                </p>
+              )}
+            </div>
+
+            {/* DOCX Upload */}
+            <div className="mb-6">
+              <label htmlFor="docx_file" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Upload DOCX File (Optional)
+              </label>
+              <input
+                type="file"
+                id="docx_file"
+                name="docx_file"
+                accept=".docx"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500 dark:text-gray-300
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 dark:file:bg-gray-700 
+                  file:text-blue-700 dark:file:text-gray-200
+                  hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
+              />
+              {formData.docx_file && (
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Selected file: {formData.docx_file.name} ({Math.round(formData.docx_file.size / 1024)} KB)
                 </p>
               )}
             </div>
