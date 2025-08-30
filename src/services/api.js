@@ -58,8 +58,13 @@ export const paperworksAPI = {
 
 // Reports API
 export const reportsAPI = {
-  getSummary: () => api.get('/api/reports/summary/'),
+  getSummary: () => api.get('/api/stats/admin/'),  // ✅ corrected
   exportCSV: () => api.get('/api/reports/export-csv/', { responseType: 'blob' }),
+};
+
+// Researcher stats API
+export const researcherStatsAPI = {
+  getSummary: () => api.get('/api/stats/researcher/')
 };
 
 // Notifications API

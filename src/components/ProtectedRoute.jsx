@@ -17,7 +17,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    toast.error('Please login to access this page');
+    // toast.error('Please login to access this page');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
