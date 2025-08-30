@@ -66,7 +66,6 @@ const PaperworkDetail = () => {
       SUBMITTED: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
       CHANGES_REQUESTED: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
     };
-
     return (
       <span
         className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -153,11 +152,11 @@ const PaperworkDetail = () => {
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100 shadow-sm">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">{paperwork.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">{paperwork.title}</h1>
             <div className="mt-2 flex items-center">
               {getStatusBadge(paperwork.status)}
               {paperwork.deadline && (
-                <div className="ml-4 text-sm text-gray-600 flex items-center">
+                <div className="ml-4 text-sm text-gray-600 dark:text-gray-300 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -216,8 +215,9 @@ const PaperworkDetail = () => {
         </div>
       </div>
 
+      {/* Tabs */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
-        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <nav className="-mb-px flex">
             <button
               onClick={() => setActiveTab('details')}
@@ -279,6 +279,7 @@ const PaperworkDetail = () => {
           </nav>
         </div>
 
+        {/* Tab Panels */}
         <div className="p-6">
           {activeTab === 'details' && (
             <div>
@@ -595,3 +596,4 @@ const PaperworkDetail = () => {
 };
 
 export default PaperworkDetail;
+
