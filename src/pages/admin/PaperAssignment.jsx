@@ -247,22 +247,23 @@ const PaperAssignment = () => {
             </div>
           </div>
           <div className="w-full md:w-1/4">
-            <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Filter by Status
-            </label>
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="all">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="DRAFT">Draft</option>
-            </select>
-          </div>
+  <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+    Filter by Status
+  </label>
+  <select
+    id="statusFilter"
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+  >
+    <option value="all">All Statuses</option>
+    <option value="ASSIGNED">Assigned</option>
+    <option value="SUBMITTED">Submitted</option>
+    <option value="APPROVED">Approved</option>
+    <option value="CHANGES_REQUESTED">Changes Requested</option>
+  </select>
+</div>
+
         </div>
 
         <div className="overflow-x-auto">

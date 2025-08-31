@@ -92,8 +92,8 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border border-yellow-100 dark:border-yellow-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
-          <CardHeader className="pb-2 bg-yellow-50 dark:bg-yellow-900 border-b border-yellow-100 dark:border-yellow-900">
+        <Card className="border border-yellow-100 dark:border-blue-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
+          <CardHeader className="pb-2 bg-yellow-50 dark:bg-blue-900 border-b border-yellow-100 dark:border-blue-900">
             <CardTitle className="text-lg flex items-center">
               Pending Review
             </CardTitle>
@@ -103,8 +103,8 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border border-green-100 dark:border-green-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
-          <CardHeader className="pb-2 bg-green-50 dark:bg-green-900 border-b border-green-100 dark:border-green-900">
+        <Card className="border border-green-100 dark:border-blue-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
+          <CardHeader className="pb-2 bg-green-50 dark:bg-blue-900 border-b border-green-100 dark:border-blue-900">
             <CardTitle className="text-lg flex items-center">Approved</CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
@@ -112,8 +112,8 @@ const UserDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border border-red-100 dark:border-red-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
-          <CardHeader className="pb-2 bg-red-50 dark:bg-red-900 border-b border-red-100 dark:border-red-900">
+        <Card className="border border-red-100 dark:border-blue-900 shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800">
+          <CardHeader className="pb-2 bg-red-50 dark:bg-blue-900 border-b border-red-100 dark:border-blue-900">
             <CardTitle className="text-lg flex items-center">Changes Requested</CardTitle>
           </CardHeader>
           <CardContent className="pt-4">

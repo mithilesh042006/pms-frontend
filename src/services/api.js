@@ -34,7 +34,7 @@ export const adminAPI = {
   updateUserStatus: (username, status) => api.patch(`/admin_app/updateusers/${username}/status/`, { status }),
   assignPaperwork: (paperworkData) => api.post('/admin_app/paperworks/', paperworkData),
   updatePaperworkDeadline: (id, deadline) => api.patch(`/admin_app/paperworks/${id}/deadline/`, { deadline }),
-  reviewPaperwork: (id, reviewData) => api.post(`/admin_app/paperworks/${id}/review/`, reviewData),
+  reviewPaperwork: (id, reviewData) => api.post(`/api/paperworks/${id}/review/`, reviewData),
   getPaperworkById: (id) => api.get(`/api/paperworks/${id}/`),
   getPaperworkVersions: (id) => api.get(`/api/paperworks/${id}/versions/`),
 };
@@ -60,7 +60,7 @@ export const paperworksAPI = {
 
 // Reports API
 export const reportsAPI = {
-  getSummary: () => api.get('/api/stats/admin/'),  // ✅ corrected
+  getSummary: () => api.get('/api/stats/admin/'),
   exportCSV: () => api.get('/api/reports/export-csv/', { responseType: 'blob' }),
 };
 

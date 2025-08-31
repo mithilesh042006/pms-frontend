@@ -300,7 +300,7 @@ const PaperworkDetail = () => {
                       <span className="text-gray-500 dark:text-gray-400 text-sm block">Status</span>
                       <div className="mt-1">{getStatusBadge(paperwork.status)}</div>
                     </div>
-                    <div className="border-b border-gray-100 dark:border-gray-600 pb-3">
+                    {/* <div className="border-b border-gray-100 dark:border-gray-600 pb-3">
                       <span className="text-gray-500 dark:text-gray-400 text-sm block">Assigned Date</span>
                       <p className="font-medium text-gray-900 dark:text-gray-100 mt-1 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -308,7 +308,7 @@ const PaperworkDetail = () => {
                         </svg>
                         {formatDate(paperwork.created_at)}
                       </p>
-                    </div>
+                    </div> */}
                     <div className="border-b border-gray-100 dark:border-gray-600 pb-3">
                       <span className="text-gray-500 dark:text-gray-400 text-sm block">Last Updated</span>
                       <p className="font-medium text-gray-900 dark:text-gray-100 mt-1 flex items-center">
@@ -366,7 +366,7 @@ const PaperworkDetail = () => {
                 </div>
               </div>
 
-              <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+              {/* <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                 <h2 className="text-lg font-semibold mb-4 flex items-center text-blue-700 dark:text-blue-400">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
@@ -380,7 +380,7 @@ const PaperworkDetail = () => {
                     <p className="text-gray-400 italic">No description provided.</p>
                   )}
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 
