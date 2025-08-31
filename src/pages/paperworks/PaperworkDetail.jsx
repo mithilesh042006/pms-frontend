@@ -20,16 +20,15 @@ const PaperworkDetail = () => {
   const fetchPaperworkData = async () => {
     try {
       setLoading(true);
-      const [paperworkResponse, versionsResponse, reviewsResponse] =
-        await Promise.all([
-          paperworksAPI.getPaperworkById(id),
-          paperworksAPI.getVersions(id),
-          paperworksAPI.getReviews(id), // ✅ new
-        ]);
-
+      const paperworkResponse = await paperworksAPI.getPaperworkById(id);
       setPaperwork(paperworkResponse.data);
+
+      const versionsResponse = await paperworksAPI.getVersions(id);
       setVersions(versionsResponse?.data?.results || versionsResponse?.data || []);
-      setReviews(Array.isArray(reviewsResponse.data) ? reviewsResponse.data : []);
+
+      // NEW: fetch reviews
+      const reviewsResponse = await paperworksAPI.getReviews(id);
+      setReviews(reviewsResponse.data || []);
     } catch (error) {
       console.error('Error fetching paperwork data:', error);
       toast.error('Failed to load paperwork details');
@@ -39,7 +38,7 @@ const PaperworkDetail = () => {
   };
 
   fetchPaperworkData();
-}, [id]);;
+}, [id]);
 
   const handleDownload = async (filePath, filename) => {
     try {
@@ -571,13 +570,16 @@ const PaperworkDetail = () => {
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {review.comments}
-                </span>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {formatDate(review.created_at)}
                 </p>
               </div>
+              {getStatusBadge(review.status)}
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md border border-gray-100 dark:border-gray-600">
+              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                {review.comments}
+              </p>
             </div>
           </div>
         ))}
@@ -585,6 +587,7 @@ const PaperworkDetail = () => {
     )}
   </div>
 )}
+
 
         </div>
       </div>
