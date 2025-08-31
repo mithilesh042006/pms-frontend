@@ -43,20 +43,25 @@ export const adminAPI = {
 export const paperworksAPI = {
   getAllPaperworks: () => api.get('/api/paperworks/'),
   getPaperworkById: (id) => api.get(`/api/paperworks/${id}/`),
-  createPaperwork: (formData) => api.post('/api/paperworks/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
-  submitVersion: (id, formData) => api.post(`/api/paperworks/${id}/versions/`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
+  createPaperwork: (formData) =>
+    api.post('/api/paperworks/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  submitVersion: (id, formData) =>
+    api.post(`/api/paperworks/${id}/versions/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   getVersions: (id) => api.get(`/api/paperworks/${id}/versions/`),
-  getVersionDetails: (id, versionId) => api.get(`/api/paperworks/${id}/versions/${versionId}/`),
-  downloadFile: (url) => api.get(url, { responseType: 'blob', headers: { 'Accept': 'application/octet-stream' } }),
+  getVersionDetails: (id, versionId) =>
+    api.get(`/api/paperworks/${id}/versions/${versionId}/`),
+  getReviews: (id) => api.get(`/api/paperworks/${id}/reviews/`), // ✅ NEW
+  downloadFile: (url) =>
+    api.get(url, {
+      responseType: 'blob',
+      headers: { Accept: 'application/octet-stream' },
+    }),
 };
+
 
 // Reports API
 export const reportsAPI = {

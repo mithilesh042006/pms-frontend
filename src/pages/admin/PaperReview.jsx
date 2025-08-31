@@ -182,27 +182,33 @@ const PaperReview = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Version History</h2>
-            {versions.length > 0 ? (
-              <div className="space-y-4">
-                {versions.map((version) => (
-                  <div
-                    key={version.id}
-                    className="p-4 border rounded-md border-gray-200 dark:border-gray-600"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-gray-900 dark:text-white">Version {version.version_no}</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatDate(version.submitted_at)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400">No versions available</p>
-            )}
+  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Version History</h2>
+  {versions.length > 0 ? (
+    <div className="space-y-4">
+      {versions.map((version) => (
+        <div
+          key={version.id}
+          className="p-4 border rounded-md border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+          onClick={() =>
+            navigate(`/admin/papers/${paperId}/versions/${version.version_no}`)
+          }
+        >
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-medium text-gray-900 dark:text-white">
+              Version {version.version_no}
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {formatDate(version.submitted_at)}
+            </span>
           </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500 dark:text-gray-400">No versions available</p>
+  )}
+</div>
+
         </div>
       </div>
 
@@ -219,7 +225,7 @@ const PaperReview = () => {
             >
               <option value="">Select status</option>
               <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
+              <option value="CHANGES_REQUESTED">Changes Requested</option>
             </select>
             <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Comments</label>
             <textarea

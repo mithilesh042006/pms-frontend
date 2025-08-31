@@ -14,27 +14,32 @@ const PaperworkDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('details');
   const [activeFile, setActiveFile] = useState(null);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    const fetchPaperworkData = async () => {
-      try {
-        setLoading(true);
-        const paperworkResponse = await paperworksAPI.getPaperworkById(id);
-        setPaperwork(paperworkResponse.data);
+  const fetchPaperworkData = async () => {
+    try {
+      setLoading(true);
+      const [paperworkResponse, versionsResponse, reviewsResponse] =
+        await Promise.all([
+          paperworksAPI.getPaperworkById(id),
+          paperworksAPI.getVersions(id),
+          paperworksAPI.getReviews(id), // ✅ new
+        ]);
 
-        const versionsResponse = await paperworksAPI.getVersions(id);
-        // robust fallback for either an array or a `{ results: [...] }` shape
-        setVersions(versionsResponse?.data?.results || versionsResponse?.data || []);
-      } catch (error) {
-        console.error('Error fetching paperwork data:', error);
-        toast.error('Failed to load paperwork details');
-      } finally {
-        setLoading(false);
-      }
-    };
+      setPaperwork(paperworkResponse.data);
+      setVersions(versionsResponse?.data?.results || versionsResponse?.data || []);
+      setReviews(Array.isArray(reviewsResponse.data) ? reviewsResponse.data : []);
+    } catch (error) {
+      console.error('Error fetching paperwork data:', error);
+      toast.error('Failed to load paperwork details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchPaperworkData();
-  }, [id]);
+  fetchPaperworkData();
+}, [id]);;
 
   const handleDownload = async (filePath, filename) => {
     try {
@@ -258,24 +263,25 @@ const PaperworkDetail = () => {
               Versions <span className="ml-1 bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs">{versions.length}</span>
             </button>
             <button
-              onClick={() => setActiveTab('feedback')}
-              className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${
-                activeTab === 'feedback'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-5 w-5 mr-2 ${activeTab === 'feedback' ? 'text-blue-500' : 'text-gray-400'}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-              </svg>
-              Feedback
-            </button>
+  onClick={() => setActiveTab('reviews')}
+  className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${
+    activeTab === 'reviews'
+      ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800'
+      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+  }`}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={`h-5 w-5 mr-2 ${activeTab === 'reviews' ? 'text-blue-500' : 'text-gray-400'}`}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+  </svg>
+  Reviews
+</button>
+
           </nav>
         </div>
 
@@ -540,55 +546,46 @@ const PaperworkDetail = () => {
             </div>
           )}
 
-          {activeTab === 'feedback' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4 flex items-center text-blue-700 dark:text-blue-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                </svg>
-                Reviewer Feedback
-              </h2>
+          {activeTab === 'reviews' && (
+  <div>
+    <h2 className="text-lg font-semibold mb-4 flex items-center text-blue-700 dark:text-blue-400">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+      </svg>
+      Admin Reviews
+    </h2>
 
-              {!Array.isArray(paperwork.feedback) || paperwork.feedback.length === 0 ? (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300 p-6 rounded-lg flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  No feedback has been provided yet.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {paperwork.feedback.map((fb, index) => (
-                    <div
-                      key={fb.id || `${fb.created_at}-${index}`}
-                      className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <span className="font-medium flex items-center text-gray-900 dark:text-gray-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            {fb.reviewer_name || 'Reviewer'}
-                          </span>
-                          <span className="text-gray-500 dark:text-gray-400 text-sm ml-2 flex items-center mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {formatDate(fb.created_at)}
-                          </span>
-                        </div>
-                        {getStatusBadge(fb.status)}
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md border border-gray-100 dark:border-gray-600">
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{fb.comments}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+    {reviews.length === 0 ? (
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300 p-6 rounded-lg flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        No reviews have been provided yet.
+      </div>
+    ) : (
+      <div className="space-y-4">
+        {reviews.map((review) => (
+          <div
+            key={review.id}
+            className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-all hover:shadow-md"
+          >
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
+                  {review.comments}
+                </span>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {formatDate(review.created_at)}
+                </p>
+              </div>
             </div>
-          )}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
         </div>
       </div>
     </div>
