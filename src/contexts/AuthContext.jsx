@@ -1,10 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { api, authAPI } from '../services/api';
+import { authAPI } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export const AuthContext = createContext();
-
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -13,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem('token');
     if (token) {
       fetchUserData();
@@ -26,19 +24,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authAPI.login({ username, password });
       const { access, refresh, user: userData } = response.data;
-      
+
       localStorage.setItem('token', access);
+      localStorage.setItem('refresh', refresh);
+
       setUser(userData);
       setIsAuthenticated(true);
       setLoading(false);
-      
-      // Redirect based on user role
-      if (userData.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
-      
+
+      redirectByRole(userData.role);
       toast.success('Login successful');
       return true;
     } catch (error) {
@@ -48,12 +42,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLoginSuccess = async () => {
+    try {
+      const userData = await fetchUserData(); // fetch user from backend
+      if (userData) {
+      redirectByRole(userData.role);
+      }
+    } catch (error) {
+      console.error('Google login fetch error:', error);
+      toast.error('Failed to load user profile');
+    }
+  };
+
   const fetchUserData = async () => {
     try {
       const response = await authAPI.getCurrentUser();
       setUser(response.data);
       setIsAuthenticated(true);
       setLoading(false);
+
+      return response.data;
     } catch (error) {
       console.error('Error fetching user data:', error);
       localStorage.removeItem('token');
@@ -62,7 +70,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  
+  const redirectByRole = (role) => {
+    if (role === 'ADMIN') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
+    }
+  };
 
   const register = async (userData) => {
     try {
@@ -71,37 +85,31 @@ export const AuthProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       console.error('Registration error:', error);
-      
-      // Handle different types of error responses
+
       if (error.response?.data) {
-        // If there are field-specific errors, display them
         const errorData = error.response.data;
         if (typeof errorData === 'object' && !Array.isArray(errorData)) {
-          // Handle field-specific validation errors
-          Object.keys(errorData).forEach(field => {
-            const errorMessages = errorData[field];
-            if (Array.isArray(errorMessages)) {
-              errorMessages.forEach(message => {
-                toast.error(`${field}: ${message}`);
-              });
-            } else if (typeof errorMessages === 'string') {
-              toast.error(`${field}: ${errorMessages}`);
+          Object.keys(errorData).forEach((field) => {
+            const messages = errorData[field];
+            if (Array.isArray(messages)) {
+              messages.forEach((msg) => toast.error(`${field}: ${msg}`));
+            } else {
+              toast.error(`${field}: ${messages}`);
             }
           });
         } else {
-          // Handle general error message
           toast.error(error.response.data.message || 'Registration failed');
         }
       } else {
         toast.error('Registration failed. Please try again.');
       }
-      
       throw error;
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
     setUser(null);
     setIsAuthenticated(false);
     navigate('/');
@@ -115,8 +123,9 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    fetchUserData
+    fetchUserData,
+    googleLoginSuccess,
   };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

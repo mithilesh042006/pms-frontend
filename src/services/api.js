@@ -11,7 +11,7 @@ export const api = axios.create({
 // Add request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,6 +25,7 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login/', credentials),
   register: (userData) => api.post('/auth/register/', userData),
   getCurrentUser: () => api.get('/auth/me/'),
+  googleLogin: (idToken) => api.post('/auth/google/', { id_token: idToken }),
 };
 
 // Admin API
